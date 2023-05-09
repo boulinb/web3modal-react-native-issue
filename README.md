@@ -7,6 +7,7 @@
 - Expo : 48.0.6
 - React : 18.2.0
 - React-Native : 0.71.3
+- iOS : 16.3/16.4
 
 ## Issues :
 
