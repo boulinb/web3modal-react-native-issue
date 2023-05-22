@@ -12,8 +12,6 @@ import {useSnapshot} from "valtio";
 import {AccountCtrl} from "@web3modal/react-native/src/controllers/AccountCtrl";
 
 export default function App() {
-  useInitialization();
-
   const { open, isConnected, provider, isOpen, close } = useWeb3Modal();
 
   const accountState = useSnapshot(AccountCtrl.state);
@@ -52,6 +50,21 @@ export default function App() {
     }
   }
 
+  const DEFAULT_CHAIN = ['eip155:1', 'eip155:56', 'eip155:137'];
+
+  const REQUIRED_METHODS = ['eth_sendTransaction', 'personal_sign'];
+  const REQUIRED_EVENTS = ['chainChanged', 'accountsChanged'];
+  const sessionParams = {
+    namespaces: {
+      eip155: {
+        methods: REQUIRED_METHODS,
+        chains: DEFAULT_CHAIN,
+        events: REQUIRED_EVENTS,
+        rpcMap: {},
+      },
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.container}>
@@ -68,12 +81,14 @@ export default function App() {
           <Text>{'sign'}</Text>
         </Pressable>
       </View>
-      <Web3Modal projectId={ENV_PROJECT_ID}  providerMetadata={{
-        name: 'AppName',
-        description: 'AppDescription',
-        url: 'https://appUrl.com',
-        icons: ['https://appImage.com']
-      }}
+      <Web3Modal projectId={ENV_PROJECT_ID}
+                 sessionParams={sessionParams}
+                 providerMetadata={{
+                  name: 'AppName',
+                  description: 'AppDescription',
+                  url: 'https://appUrl.com',
+                  icons: ['https://appImage.com']
+                }}
       />
     </View>
   );
