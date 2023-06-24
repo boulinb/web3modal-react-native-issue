@@ -56,10 +56,10 @@ export default function App() {
   }
 
   // Worked
-  const DEFAULT_CHAIN = ['eip155:1'];
+  //const DEFAULT_CHAIN = ['eip155:1'];
 
   // Not working
-  //const DEFAULT_CHAIN = ['eip155:1', 'eip155:56', 'eip155:137'];
+  const DEFAULT_CHAIN = ['eip155:1', 'eip155:56', 'eip155:137'];
 
   const REQUIRED_METHODS = ['eth_sendTransaction', 'personal_sign'];
   const REQUIRED_EVENTS = ['chainChanged', 'accountsChanged'];
