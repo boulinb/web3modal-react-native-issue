@@ -3,16 +3,17 @@ import "fast-text-encoding";
 import "@walletconnect/react-native-compat";
 import { Pressable, StyleSheet, Text, View} from "react-native";
 import { registerRootComponent } from "expo";
-import {Web3Modal, useWeb3Modal} from '@web3modal/react-native';
+import {WalletConnectModal, useWalletConnectModal} from '@walletconnect/modal-react-native';
 
 import useInitialization, { ENV_PROJECT_ID } from "../utils/WalletConnectUtils";
 import React from "react";
 import { EIP155_SIGNING_METHODS } from "../utils/EIP155Lib";
 import {useSnapshot} from "valtio";
-import {AccountCtrl} from "@web3modal/react-native/src/controllers/AccountCtrl";
+import {AccountCtrl} from "@walletconnect/modal-react-native/src/controllers/AccountCtrl";
+import {ClientCtrl} from "@walletconnect/modal-react-native/src/controllers/ClientCtrl";
 
 export default function App() {
-  const { open, isConnected, provider, isOpen, close } = useWeb3Modal();
+  const { open, isConnected, provider, isOpen, close } = useWalletConnectModal();
 
   const accountState = useSnapshot(AccountCtrl.state);
 
@@ -34,23 +35,31 @@ export default function App() {
   }
 
   const onSignReq = async () => {
-    if (isConnected) {
-      try {
-        const MY_ACCOUNT = '0x0000...';
+    try {
+      // Replace by your pubKey
+      const MY_ACCOUNT = '0x0000...';
 
-        const res = await provider.request({
-          method: EIP155_SIGNING_METHODS.PERSONAL_SIGN,
-          params: [getLoginSignatureModel(MY_ACCOUNT, '12345'), MY_ACCOUNT]
-        }, 'eip155:1');
+      const res = await provider.request({
+        method: EIP155_SIGNING_METHODS.PERSONAL_SIGN,
+        params: [getLoginSignatureModel(MY_ACCOUNT, '12345'), MY_ACCOUNT]
+      }, 'eip155:1');
 
-        console.log('res : ', res);
-      } catch (e) {
-        console.log('catch req : ', e);
-      }
+      console.log('res : ', res);
+    } catch (e) {
+      console.log('catch req : ', e);
     }
   }
 
-  const DEFAULT_CHAIN = ['eip155:1', 'eip155:56', 'eip155:137'];
+  const onDisconnect = () => {
+    ClientCtrl.provider()?.disconnect();
+    AccountCtrl?.resetAccount();
+  }
+
+  // Worked
+  const DEFAULT_CHAIN = ['eip155:1'];
+
+  // Not working
+  //const DEFAULT_CHAIN = ['eip155:1', 'eip155:56', 'eip155:137'];
 
   const REQUIRED_METHODS = ['eth_sendTransaction', 'personal_sign'];
   const REQUIRED_EVENTS = ['chainChanged', 'accountsChanged'];
@@ -80,8 +89,11 @@ export default function App() {
         <Pressable style={{marginTop: 32 }} onPress={onSignReq}>
           <Text>{'sign'}</Text>
         </Pressable>
+        <Pressable style={{marginTop: 32 }} onPress={onDisconnect}>
+          <Text>{'disconnect'}</Text>
+        </Pressable>
       </View>
-      <Web3Modal projectId={ENV_PROJECT_ID}
+      <WalletConnectModal projectId={ENV_PROJECT_ID}
                  sessionParams={sessionParams}
                  providerMetadata={{
                   name: 'AppName',
